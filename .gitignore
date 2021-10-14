@@ -4,6 +4,7 @@
 *.symvers
 *.o*
 *.order
+*.swp*
 usocket_srv
 usocket_cli
 test

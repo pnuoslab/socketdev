@@ -49,7 +49,7 @@ int recv_packet(int client_fd, packet_t *packet)
 	int len;
 
 	len = recv(client_fd, packet, sizeof(packet_t), MSG_WAITALL);
-	if (len <= 0)
+	if (len != sizeof(packet_t))
 		perror("recv failed");
 
 #if SERV_DEBUG
@@ -65,7 +65,7 @@ int write_data(int client_fd, int fd, packet_t *packet, char *buffer)
 	int len;
 
 	len = recv(client_fd, buffer, packet->size, MSG_WAITALL);
-	if (len <= 0) {
+	if (len != packet->size) {
 		perror("recv failed");
 		return len;
 	}
@@ -81,8 +81,8 @@ int write_data(int client_fd, int fd, packet_t *packet, char *buffer)
 	if (pwrite(fd, buffer, packet->size, packet->offset) != (ssize_t)packet->size)
 		perror("write failed");
 #endif
-	len = send(client_fd, packet, sizeof(packet_t), 0);
-	if (len <= 0)
+	len = send(client_fd, packet, sizeof(packet_t), MSG_EOR);
+	if (len != sizeof(packet_t))
 		perror("send failed");
 
 	return len;
@@ -104,13 +104,13 @@ int read_data(int client_fd, int fd, packet_t *packet, char *buffer)
 #endif
 
 	len = send(client_fd, packet, sizeof(packet_t), MSG_MORE);
-	if (len <= 0) {
+	if (len != sizeof(packet_t)) {
 		perror("send failed");
 		return len;
 	}
 
 	len = send(client_fd, buffer, packet->size, MSG_EOR);
-	if (len <= 0)
+	if (len != packet->size)
 		perror("send failed");
 
 	return len;
@@ -118,7 +118,7 @@ int read_data(int client_fd, int fd, packet_t *packet, char *buffer)
 
 void send_serv_cores(int client_fd)
 {
-	if (send(client_fd, &ncores, sizeof(int), 0) <= MSG_EOR) {
+	if (send(client_fd, &ncores, sizeof(int), MSG_EOR) != sizeof(int)) {
 		perror("can't initialized");
 		return;
 	}
@@ -139,7 +139,7 @@ void *handle_packet(void *data)
 		goto out;
 	}
 
-	fd = open("/mnt/ramdisk/data_file", O_RDWR);
+	fd = open("/mnt/nvme/data_file", O_CREAT | O_RDWR);
 	if (fd < 0) {
 		perror("open error");
 		free(buffer);

@@ -454,6 +454,8 @@ static int blkdev_add_device(void)
 		dev->queue = q;
 		dev->queue->queuedata = dev;
 
+		blk_queue_max_hw_sectors(q, 4 * 1024);
+
 		/* minor is 1 */
 		if ((disk = alloc_disk(1)) == NULL) {
 			BLKDEV_ERRMSG;

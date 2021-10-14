@@ -1,9 +1,8 @@
 CC=gcc
-PROJECT_ROOT=/home/suho/oslab
 obj-m+=blkdev.o
 
-EXTRA_LDFLAGS := -I$(PROJECT_ROOT)/socket-blk-mq/ksocket
-KBUILD_EXTRA_SYMBOLS='$(PROJECT_ROOT)/socket-blk-mq/ksocket/Module.symvers'
+EXTRA_LDFLAGS := -I$(PWD)/../ksocket
+KBUILD_EXTRA_SYMBOLS='$(PWD)/../ksocket/Module.symvers'
 
 all: module
 
