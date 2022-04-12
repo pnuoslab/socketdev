@@ -9,16 +9,16 @@
 #include <signal.h>
 #include <pthread.h>
 
-#define ALLOW_FTL	0
+#define ALLOW_FTL	1
 
 #if ALLOW_FTL
-#include "include/module.h"
-#include "include/flash.h"
-#include "include/page.h"
-#include "include/device.h"
+#include "module.h"
+#include "flash.h"
+#include "page.h"
+#include "device.h"
 #endif
 
-#define SERV_DEBUG	0
+#define SERV_DEBUG	1
 
 typedef unsigned long long u64;
 typedef unsigned short u16;
@@ -49,8 +49,9 @@ int recv_packet(int client_fd, packet_t *packet)
 	int len;
 
 	len = recv(client_fd, packet, sizeof(packet_t), MSG_WAITALL);
-	if (len != sizeof(packet_t))
-		perror("recv failed");
+  if (len != sizeof(packet_t)) {
+		perror("recv packet failed");
+  }
 
 #if SERV_DEBUG
 	printf("recv packet op(%d) offset(%lu) size(%llu) tag(%u)\n",
@@ -139,7 +140,7 @@ void *handle_packet(void *data)
 		goto out;
 	}
 
-	fd = open("/mnt/nvme/data_file", O_CREAT | O_RDWR);
+	fd = open("data_file", O_CREAT | O_RDWR);
 	if (fd < 0) {
 		perror("open error");
 		free(buffer);
@@ -245,7 +246,7 @@ int main()
 
 #if ALLOW_FTL
 	module_init(PAGE_FTL_MODULE, &flash, RAMDISK_MODULE);
-	flash->f_op->open(flash, NULL);
+	flash->f_op->open(flash, NULL, O_CREAT | O_RDWR);
 #endif
 
 	init_server();

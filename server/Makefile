@@ -1,6 +1,7 @@
 CC=gcc
 
-LIBS = -lpthread
+LIBS = -lpthread -lftl $(shell pkg-config --libs glib-2.0)
+CFLAGS = $(shell pkg-config --cflags glib-2.0) -I/usr/local/include/ftl
 
 SERVER_OBJS=usocket_srv.o
 CLIENT_OBJS=usocket_cli.o
@@ -11,7 +12,7 @@ CLIENT_TARGET=usocket_cli
 all: server client
 
 server: $(SERVER_OBJS)
-	$(CC) -o $(SERVER_TARGET) $(SERVER_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o $(SERVER_TARGET) $(SERVER_OBJS) $(LIBS)
 
 client: $(CLIENT_OBJS)
 	$(CC) -o $(CLIENT_TARGET) $(CLIENT_OBJS)

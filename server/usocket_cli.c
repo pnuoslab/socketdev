@@ -17,7 +17,7 @@ typedef unsigned short u16;
 #define READ		0
 #define WRITE		1
 
-char *servip = "192.168.112.4";
+char *servip = "127.0.0.1";
 
 typedef struct {
 	unsigned int op;
